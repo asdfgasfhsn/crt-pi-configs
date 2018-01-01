@@ -51,7 +51,7 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
         gameCount = gameCount+1
     	# strip line breaks
         gameInfo = gameInfo.rstrip()
-        
+
         # parse info
         gameInfo = gameInfo.split(",")
         gameName = gameInfo[0]
@@ -114,8 +114,8 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
                 # Check scale factor in horizontal and vertical directions
                 vScaling = screenHeight/gameHeight
                 hScaling = screenWidth/gameWidth
-            	
-                # Keep whichever scaling factor is smaller. 
+
+                # Keep whichever scaling factor is smaller.
                 if vScaling < hScaling:
                     scaleFactor = vScaling
                 else:
@@ -129,7 +129,7 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
                     else:
                         viewportWidth = gameWidth * int(scaleFactor)
                     viewportHeight = int(gameHeight * scaleFactor)
-                    # If, somehow, the viewport height is less than the screen height, but it's within tolerance of the game height, scale to fill the screen vertically 
+                    # If, somehow, the viewport height is less than the screen height, but it's within tolerance of the game height, scale to fill the screen vertically
                     if screenHeight - viewportHeight < (gameHeight * (tolerance / 100)):
                         viewportHeight = screenHeight
 
@@ -144,11 +144,11 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
                     # Add 'overscan' area for Nestopia consoles, as per original script (more or less)
                     if ("console" and "Nestopia" in coreName):
                         viewportHeight = viewportHeight + 8 * int(scaleFactor)
-                    
+
                 # centralise the image
                 viewportX = int((screenWidth - viewportWidth) / 2)
                 viewportY = int((screenHeight - viewportHeight) / 2)
-                
+
                 #Write the output file
                 newCfgFile.write("# Auto-generated {} .cfg\n".format(shader))
                 newCfgFile.write("# Game Title : {} , Width : {}, Height : {}, Aspect : {}:{}, Scale Factor : {}\n".format(gameName, gameWidth, gameHeight, int(gameInfo[9]), int(gameInfo[10]),scaleFactor))
@@ -159,7 +159,7 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
                 # Disable shader if the scale is too small
                 if scaleFactor >= 3:
                     newCfgFile.write("video_shader_enable = \"true\"\n")
-                    newCfgFile.write("video_shader = \"/opt/retropie/configs/all/retroarch/shaders/{}\"\n".format(shader))
+                    newCfgFile.write("video_shader = \"/opt/retropie/configs/all/retroarch/shaders/retropie/{}\"\n".format(shader))
                     newCfgFile.write("aspect_ratio_index = \"22\"\n")
                     newCfgFile.write("custom_viewport_width = \"{}\"\n".format(viewportWidth))
                     newCfgFile.write("custom_viewport_height = \"{}\"\n".format(viewportHeight))
@@ -168,7 +168,7 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
                 else:
                     newCfgFile.write("# Insufficient resolution for good quality shader\n")
                     newCfgFile.write("video_shader_enable = \"false\"\n")
-                
+
                 outputLogFile.write("{},{},{},{},{},{},{},{},{},{},{}\n".format(gameInfo[0],gameInfo[1],gameInfo[2],gameInfo[3],gameInfo[9],gameInfo[10],viewportWidth,viewportHeight,viewportX,viewportY,scaleFactor))
 
         newCfgFile.close()
