@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # creates cfg files for crt-pi
 # params are:
 # * core (eg mame2003 or fbalpha)
