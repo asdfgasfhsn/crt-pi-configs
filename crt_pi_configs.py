@@ -11,12 +11,12 @@
 # python -c "import crt_pi_configs; crt_pi_configs.createZip(False,1920,1080)"
 
 from __future__ import division
+import argparse
 import sys
 import os
 import shutil
 
-
-def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
+def generateConfigs(core, curvature=False, overlay=False, screenWidth=0, screenHeight=0):
     console = False
     if "mame2003" in core:
         fileName = "resolution_db/mame2003.txt"
@@ -172,6 +172,11 @@ def generateConfigs(core, curvature=False, screenWidth=0, screenHeight=0):
 
                 outputLogFile.write("{},{},{},{},{},{},{},{},{},{},{}\n".format(gameInfo[0],gameInfo[1],gameInfo[2],gameInfo[3],gameInfo[9],gameInfo[10],viewportWidth,viewportHeight,viewportX,viewportY,scaleFactor))
 
+        if overlay:
+            newCfgFile.write("input_overlay = \"{}\"\n".format(overlayInfo(gameName, gameOrientation)))
+            newCfgFile.write("input_overlay_opacity = \"0.800000\"\n")
+            newCfgFile.write("input_overlay_scale = \"1.000000\"\n")
+
         newCfgFile.close()
 
     resolutionDbFile.close()
@@ -201,9 +206,28 @@ def createZip(curvature=False, screenWidth=0, screenHeight=0):
     print("Deleting temp directory: {}".format(path))
     shutil.rmtree(path)
 
+def overlayInfo(gameName, gameOrientation):
+    if console:
+        overlayFile = overlayPath + gameName + '/default.cfg'
+    else:
+        if os.path.isfile(overlayPath + 'arcade/' + gameName + '.cfg'):
+             overlayFile = overlayPath + 'arcade/' + gameName + '.cfg'
+        else:
+            if 'V' in gameOrientation:
+                overlayFile = overlayPath + 'arcade/' + 'default-vertical' + '.cfg'
+            else:
+                overlayFile = overlayPath + 'arcade/' + 'default' + '.cfg'
+
+    return overlayFile
 
 if __name__ == "__main__":
-    if "curvature" in sys.argv[2]:
-        generateConfigs(sys.argv[1], True)
-    else:
-        generateConfigs(sys.argv[1], False, int(sys.argv[2]), int(sys.argv[3]))
+    overlayPath = '/opt/retropie/configs/all/retroarch/overlay/'
+    console=False
+    parser = argparse.ArgumentParser(description='Generate RetroArch shader and overlay configs.')
+    parser.add_argument('--core', help='system name', choices=['mame2003', 'fbalpha', 'consoles'])
+    parser.add_argument('--overlay',  action='store_true', help='enable overlays', default=False)
+    parser.add_argument('--curvature', action='store_true', help='enable curvature shader', default=False)
+    parser.add_argument('--width', type=int, help='screen width', default=0)
+    parser.add_argument('--height', type=int, help='screen height', default=0)
+    args = parser.parse_args()
+    generateConfigs(args.core, args.curvature, args.overlay, args.width, args.height)
